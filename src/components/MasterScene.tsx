@@ -24,6 +24,9 @@ import { DataPackets } from './DataPackets';
 import { NeuralConstellations } from './NeuralConstellations';
 import { ThoughtStreams } from './ThoughtStreams';
 import { QuantumParticles } from './QuantumParticles';
+import { NeuralLightning } from './NeuralLightning';
+import { EnergyVeins } from './EnergyVeins';
+import { MouseInteraction } from './MouseInteraction';
 import { HUDPanel } from './HUDPanel';
 import { CommandBar } from './CommandBar';
 import { DataRadar } from './DataRadar';
@@ -77,6 +80,8 @@ export const MasterScene = ({ onCoreClick }: MasterSceneProps) => {
       <DNAMemoryHelix position={[28, 0, -18]} height={16} color="#8844ff" />
       <DataPackets count={25} color="#00ffff" />
       <QuantumParticles count={4000} color="#00ffff" />
+      <NeuralLightning count={10} radius={14} color="#00ffff" />
+      <EnergyVeins count={6} radius={16} color="#8844ff" />
 
       {/* ============== GRID FLOOR ============== */}
       <GridFloor position={[0, -8, 0]} color="#0066ff" opacity={0.1} />
@@ -86,6 +91,9 @@ export const MasterScene = ({ onCoreClick }: MasterSceneProps) => {
 
       {/* Energy Streams - flowing into core */}
       <EnergyStreams count={60} radius={7} color="#00ffff" />
+
+      {/* Mouse Interaction - cursor energy field */}
+      <MouseInteraction />
 
       {/* ============== RINGS LAYER (Layer 5) ============== */}
       <EnergyHalo radius={4.5} color="#00ffff" speed={0.8} opacity={0.4} />

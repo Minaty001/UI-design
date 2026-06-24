@@ -3,10 +3,14 @@ import { MasterScene } from './components/MasterScene';
 import { HUDOverlay } from './components/HUDOverlay';
 import { HolographicCursor } from './components/HolographicCursor';
 import { BootSequence } from './components/BootSequence';
+import { RippleClickEffect } from './components/RippleClickEffect';
+import { FloatingTooltips } from './components/FloatingTooltips';
+import { RadialMenu } from './components/RadialMenu';
 import './index.css';
 
 function App() {
   const [booted, setBooted] = useState(false);
+  const [showRadial, setShowRadial] = useState(false);
   const [notifications, setNotifications] = useState<{ id: string; text: string; type?: 'info' | 'warning' | 'success' }[]>([]);
 
   const handleBootComplete = useCallback(() => {
@@ -24,6 +28,11 @@ function App() {
     }, 3000);
   }, []);
 
+  // Double-click on background opens radial menu
+  const handleCanvasDoubleClick = useCallback(() => {
+    setShowRadial(prev => !prev);
+  }, []);
+
   // Periodic notifications
   useEffect(() => {
     if (!booted) return;
@@ -35,6 +44,8 @@ function App() {
       'MEMORY INDEXING ACTIVE',
       'HOLOGRAPHIC CALIBRATION OK',
       'ENERGY FLOW NOMINAL',
+      'DEEP SCAN INITIATED',
+      'CORE TEMPERATURE NOMINAL',
     ];
 
     const interval = setInterval(() => {
@@ -45,14 +56,38 @@ function App() {
       setNotifications(prev => [...prev, { id, text, type }]);
       setTimeout(() => {
         setNotifications(prev => prev.filter(n => n.id !== id));
-      }, 4000);
-    }, 8000);
+      }, 5000);
+    }, 7000);
 
     return () => clearInterval(interval);
   }, [booted]);
 
+  // Subtle startup notifications
+  useEffect(() => {
+    if (!booted) return;
+
+    const startupNotes = [
+      'NEURAL CORE INITIALIZED',
+      'HOLOGRAPHIC LAYERS ACTIVE',
+      'QUANTUM PROCESSOR ONLINE',
+    ];
+
+    startupNotes.forEach((text, i) => {
+      setTimeout(() => {
+        const id = `startup-${i}`;
+        setNotifications(prev => [...prev, { id, text, type: 'success' }]);
+        setTimeout(() => {
+          setNotifications(prev => prev.filter(n => n.id !== id));
+        }, 4000);
+      }, (i + 1) * 1500);
+    });
+  }, [booted]);
+
   return (
-    <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#020617' }}>
+    <div
+      style={{ width: '100vw', height: '100vh', overflow: 'hidden', background: '#020617' }}
+      onDoubleClick={handleCanvasDoubleClick}
+    >
       {/* Boot sequence */}
       {!booted && <BootSequence onComplete={handleBootComplete} />}
 
@@ -62,8 +97,39 @@ function App() {
       {/* HTML HUD Overlay */}
       {booted && <HUDOverlay notifications={notifications} />}
 
+      {/* Radial Menu */}
+      {booted && <RadialMenu isOpen={showRadial} onClose={() => setShowRadial(false)} />}
+
+      {/* Floating Tooltips */}
+      {booted && <FloatingTooltips />}
+
+      {/* Ripple Click Effects */}
+      <RippleClickEffect />
+
       {/* Custom Cursor */}
       <HolographicCursor />
+
+      {/* Startup help hint */}
+      {booted && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 70,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontFamily: 'Rajdhani, sans-serif',
+            fontSize: 10,
+            color: 'rgba(0, 255, 255, 0.15)',
+            letterSpacing: 2,
+            pointerEvents: 'none',
+            zIndex: 50,
+            animation: 'pulse 3s infinite',
+            textAlign: 'center',
+          }}
+        >
+          DOUBLE-CLICK FOR MENU • CLICK CORE FOR INTERFACE
+        </div>
+      )}
     </div>
   );
 }
